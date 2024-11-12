@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiUrl = 'https://firevuechat-a28fa-default-rtdb.firebaseio.com';
+const apiUrl = 'https://vue-auth-2f01c-default-rtdb.firebaseio.com/';
 
 const api = axios.create({
     baseURL: apiUrl

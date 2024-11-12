@@ -1,324 +1,86 @@
 <template>
-<!-- header -->
-<!-- header -->
-  <div class="view login" v-if="state.username === '' || state.username === null">
-    <form class="login-form" @submit.prevent="Login">
-      <div class="form-inner">
-        <div class="text-3xl text-center text-blue-700"> Kvn-messenger</div>
-        <label class="mt-5 italic" for="username">Username</label>
-        <input 
-        type="text"
-        v-model="inputUsername" 
-        placeholder="Please enter your username" />
-        <input
-        type="submit"
-        value="Login" />
-      </div>
-    </form>
-  </div>
-  
-  <div class="view chat" v-else> 
-	  <header class="fixed">
-		  <button @click="state.username = ''" class="underline logout">Logout</button>
-		  <h1 class="text-xl font-bold">Welcome, <strong class="text-yellow-300">{{ state.username }}</strong> </h1>
-	  </header>
-	  <section class="chat-box">
-		  <div
-		  v-for="message in state.messages" 
-		  :key="message.key"
-		  :class="(message.username == state.username ? 'message current-user' : 'message')">
-			<div class="message-inner">
-				<div class="text-green-500">{{ message.username }}</div>
-				<div class="content">{{ message.content }}</div>
+	<header class="flex shadow-xl fixed bg-white flex-row-reverse w-full justify-between">
+		<div  class="container flex items-center justify-end p-4 mx-auto">
+			<div v-if="userStore.user" class="flex items-center justify-around w-80">
+				<p class="text-green-600 underline">{{ userStore.user.email }}</p>
+				<Button @click="logout()" class="w-24 h-10">Logout</Button>
 			</div>
-		  </div>
-		  <div v-if="spinner === true" class="flex items-center justify-center">
-			  okokok
-		  </div>
-	  </section>
-	  <footer>
-		  <form @submit.prevent="SendMessage">
-			  <input
-			   type="text"
-			   v-model="inputMessage"
-			   placeholder="Write a message..." />
-			  <input
-			   type="submit"
-			    value="Send" />
-		  </form>
-	  </footer>
-  </div>
+			<button
+				class="p-2 overflow-hidden"
+				@click="switchTheme()"
+			>
+				<transition
+					enter-active-class="transition duration-200 ease-out"
+					leave-active-class="transition duration-200 ease-in"
+					:enter-from-class="currentTheme === 'dark' ? 'transform -translate-y-full scale-50 opacity-0' : 'transform translate-y-full scale-50 opacity-0'"
+					enter-to-class="transform translate-y-0"
+					leave-from-class="transform translate-y-0"
+					:leave-to-class="currentTheme === 'dark' ? 'transform translate-y-full scale-50 opacity-0' : 'transform -translate-y-full scale-50 opacity-0'"
+					mode="out-in"
+				>
+					<svg
+						v-if="currentTheme === 'dark'"
+						xmlns="http://www.w3.org/2000/svg"
+						class="w-8 h-8"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+					>
+						<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+					</svg>
+
+					<svg
+						v-else
+						xmlns="http://www.w3.org/2000/svg"
+						class="w-8 h-8"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+					>
+						<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+					</svg>
+				</transition>
+			</button>
+	    </div>
+
+		<nav class="flex w-1/2 items-center">
+			<button @click="router.push('/')" type="button" class="inline-flex flex-row items-center justify- px-5">
+				<svg class="w-7 h-7 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> <path d="M15 18H9" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+				<span class="text-base ml-1 hover:underline">Home</span>
+			</button>
+			<button @click="router.push('/auth')" type="button" class="inline-flex w-full flex-row items-center justify- px-5 ">
+				<svg class="w-7 h-7 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2.00098 11.999L16.001 11.999M16.001 11.999L12.501 8.99902M16.001 11.999L12.501 14.999" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9.00195 7C9.01406 4.82497 9.11051 3.64706 9.87889 2.87868C10.7576 2 12.1718 2 15.0002 2L16.0002 2C18.8286 2 20.2429 2 21.1215 2.87868C22.0002 3.75736 22.0002 5.17157 22.0002 8L22.0002 16C22.0002 18.8284 22.0002 20.2426 21.1215 21.1213C20.3531 21.8897 19.1752 21.9862 17 21.9983M9.00195 17C9.01406 19.175 9.11051 20.3529 9.87889 21.1213C10.5202 21.7626 11.4467 21.9359 13 21.9827" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+				<span class="text-base ml-1 hover:underline">Login or Register</span>
+			</button>
+    </nav>
+	</header>	
+
+	<RouterView />
 </template>
 
-<script>
-import { reactive, onUpdated, ref, watch } from 'vue';
-import axios from 'axios';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+<script setup>
+import { onMounted, onUpdated } from 'vue';
+import { currentTheme, initTheme, switchTheme } from '@/composables/theme.js';
+import { useUserStore } from '@/stores/userStore';
+import Button from "@/components/Button.vue";
+import { useRouter } from 'vue-router';
 
-export default {
-  setup() {
-    const inputUsername = ref("");
-	var inputMessage = ref("");
-	var spinner = false;
+const userStore = useUserStore();
+const router = useRouter();
 
-    const state = reactive({
-      username: "",
-      messages: []
-    });
+const logout = () => {
+	userStore.logout();
+	router.push('/auth');
+};
 
-    const Login = () => {
-      if (inputUsername.value != "" || inputUsername.value != null) {
-        state.username = inputUsername.value;
-        inputUsername.value = "";
-      }
-    }
-
-	onUpdated(() => {
-		 console.log(spinner);
-	 	if (spinner)
-			inputMessage = "";
-			spinner = false;
-		axios.get("https://firevuechat-a28fa-default-rtdb.firebaseio.com/messages.json")
-		.then(response =>  {
-			state.messages = response.data;
-		})
-		.catch(response => {
-		console.log("error2", response.data);
-		});
-	})
-
-	const SendMessage = () => {
-		if (inputMessage.value === "" || inputMessage.value === null)
-			return;
-		axios.post("https://firevuechat-a28fa-default-rtdb.firebaseio.com/messages.json",
-		{
-			username: state.username,
-			content: inputMessage.value
-		}).then(response => {
-			spinner = true;
-			console.log(response.data);
-			inputMessage = "";
-		}).catch(response => {
-			console.log(response);
-		});	
-	}
-		
-    return {
-		inputUsername,
-		state,
-		inputMessage,
-		spinner,
-		Login,
-		SendMessage
-	}
-  },
-}
+onMounted(() => {
+	userStore.initAuth();
+  initTheme();
+});
 </script>
-
-<style lang="scss">
-* {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-.view {
-	display: flex;
-	justify-content: center;
-	min-height: 100vh;
-	background-color: #5d5fdb;
-	
-	&.login {
-		align-items: center;
-		.login-form {
-			display: block;
-			width: 100%;
-			padding: 15px;
-			
-			.form-inner {
-				display: block;
-				background-color: #FFF;
-				padding: 50px 15px;
-				border-radius: 16px;
-				box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-				h1 {
-					color: #AAA;
-					font-size: 28px;
-					margin-bottom: 30px;
-				}
-				label {
-					display: block;
-					margin-bottom: 5px;
-					color: #AAA;
-					font-size: 16px;
-					transition: 0.4s;
-				}
-				input[type="text"] {
-					appearance: none;
-					border: none;
-					outline: none;
-					background: none;
-					display: block;
-					width: 100%;
-					padding: 10px 15px;
-					border-radius: 8px;
-					margin-bottom: 15px;
-					
-					color: #333;
-					font-size: 18px;
-					box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
-					background-color: #F3F3F3;
-					transition: 0.4s;
-					&::placeholder {
-						color: #888;
-						transition: 0.4s;
-					}
-				}
-				input[type="submit"] {
-					appearance: none;
-					border: none;
-					outline: none;
-					background: none;
-					display: block;
-					width: 100%;
-					padding: 10px 15px;
-					background-color: #5d5fdb;
-					border-radius: 8px;
-					color: #FFF;
-					font-size: 18px;
-					font-weight: 700;
-				}
-				&:focus-within {
-					label {
-						color: #5d5fdb;
-					}
-					input[type="text"] {
-						background-color: #FFF;
-						box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-						&::placeholder {
-							color: #666;
-						}
-					}
-				}
-			}
-		}
-	}
-	&.chat {
-		flex-direction: column;
-		header {
-			position: relative;
-			display: block;
-			width: 100%;
-			padding: 50px 30px 10px;
-			.logout {
-				position: absolute;
-				top: 15px;
-				right: 15px;
-				appearance: none;
-				border: none;
-				outline: none;
-				background: none;
-				
-				color: #FFF;
-				font-size: 18px;
-				margin-bottom: 10px;
-				text-align: right;
-			}
-			h1 {
-				color: #FFF;
-			}
-		}
-		.chat-box {
-			border-radius: 24px 24px 0px 0px;
-			background-color: #FFF;
-			box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
-			flex: 1 1 100%;
-			padding: 30px;
-			.message {
-				display: flex;
-				margin-bottom: 15px;
-				
-				.message-inner {
-					.username {
-						color: #888;
-						font-size: 16px;
-						margin-bottom: 5px;
-						padding-left: 15px;
-						padding-right: 15px;
-					}
-					.content {
-						display: inline-block;
-						padding: 10px 20px;
-						background-color: #F3F3F3;
-						border-radius: 999px;
-						color: #333;
-						font-size: 18px;
-						line-height: 1.2em;
-						text-align: left;
-					}
-				}
-				&.current-user {
-					margin-top: 30px;
-					justify-content: flex-end;
-					text-align: right;
-					.message-inner {
-						max-width: 75%;
-						.content {
-							color: #FFF;
-							font-weight: 600;
-							background-color: #5d5fdb;
-						}
-					}
-				}
-			}
-		}
-		footer {
-			position: sticky;
-			bottom: 0px;
-			background-color: #FFF;
-			padding: 30px;
-			box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
-			form {
-				display: flex;
-				input[type="text"] {
-					flex: 1 1 100%;
-					appearance: none;
-					border: none;
-					outline: none;
-					background: none;
-					display: block;
-					width: 100%;
-					padding: 10px 15px;
-					border-radius: 8px 0px 0px 8px;
-					
-					color: #333;
-					font-size: 18px;
-					box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
-					background-color: #F3F3F3;
-					transition: 0.4s;
-					&::placeholder {
-						color: #888;
-						transition: 0.4s;
-					}
-				}
-				
-				input[type="submit"] {
-					appearance: none;
-					border: none;
-					outline: none;
-					background: none;
-					display: block;
-					padding: 10px 15px;
-					border-radius: 0px 8px 8px 0px;
-					background-color: #5d5fdb;
-					color: #FFF;
-					font-size: 18px;
-					font-weight: 700;
-				}
-			}
-		}
-	}
-}
-</style>
