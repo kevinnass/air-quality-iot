@@ -92,7 +92,7 @@
 					</p>
 
 					<p class="text-sm font-light text-gray-500 dark:text-white">
-						Already have an account? <a @click="isLoginComponent = true" class="cursor-pointer font-medium text-slate-800 hover:underline dark:text-white">Sign up</a>
+						Already have an account? <a @click="isLoginComponent = true" class="cursor-pointer font-medium text-slate-800 hover:underline dark:text-white">Sign in</a>
 					</p>
 				</form>
 			</div>

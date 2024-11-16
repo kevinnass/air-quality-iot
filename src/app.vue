@@ -2,7 +2,7 @@
 	<header class="flex shadow-xl fixed bg-white flex-row-reverse w-full justify-between">
 		<div  class="container flex items-center justify-end p-4 mx-auto">
 			<div v-if="userStore.user" class="flex items-center justify-around w-80">
-				<p class="text-green-600 underline">{{ userStore.user.email }}</p>
+				<p class="text-green-600 ">{{ userStore.user.email }}</p>
 				<Button @click="logout()" class="w-24 h-10">Logout</Button>
 			</div>
 			<button

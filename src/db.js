@@ -38,10 +38,10 @@ export const loginUser = async (email, password) => {
   }
 }
 
-export const checkForDevices = async(userId, store) => {
+export const checkForDevices = async (userId, store) => {
   if (userId) {
     console.log('userID db:', userId);
-    const devicesRef = ref(db, `devices/${userId}`);
+    const devicesRef = ref(db, `users/${userId}`);
 
     try {
       const snapshot = await get(devicesRef);
@@ -50,9 +50,15 @@ export const checkForDevices = async(userId, store) => {
         store.setHasDevices(false);
       } else {
         store.setHasDevices(true);
+
+        // Itérer sur chaque appareil trouvé
         snapshot.forEach(deviceSnapshot => {
+          const deviceId = deviceSnapshot.key; // Récupérer le deviceId
           const deviceData = deviceSnapshot.val();
-          console.log("Appareil trouvé :", deviceData);
+
+          // Stocker le deviceId dans le store
+          store.setDeviceId(deviceId);
+          console.log("Appareil trouvé :", deviceId, deviceData);
         });
       }
     } catch (error) {
@@ -63,17 +69,20 @@ export const checkForDevices = async(userId, store) => {
   }
 };
 
+
 export const addDevice = async (userId, deviceId, store) => {
   if (userId) {
-    const deviceRef = ref(db, `devices/${userId}/${deviceId}`);
+    
+    const userInfo = ref(db, `users/${userId}/${deviceId}`);
     try {
-      await set(deviceRef, {
-        temperature: 10,
-        co2: 10,
+      await set(userInfo, {
+        temperature: 0,
+        co2: 0,
         user_id: userId,
       });
       store.setHasDevices(true);
-      console.log("device add: ", deviceRef);
+      store.setDeviceId(deviceId);
+      console.log("device add: ", userInfo);
       console.log("Device ajouté avec succès");
     } catch (error) {
       console.error("Erreur lors de l'ajout d'un device: ", error.message);
@@ -83,10 +92,11 @@ export const addDevice = async (userId, deviceId, store) => {
 
 export const removeDevice = async (userId, store) => {
   if (userId) {
-    const userDevicesRef = ref(db, `devices/${userId}`);
+    const userDevicesRef = ref(db, `users/${userId}`);
     try {
       await remove(userDevicesRef);
       store.setHasDevices(false);
+      store.setDeviceId(null);
       console.log("Tous les appareils de l'utilisateur ont été supprimés avec succès");
     } catch (error) {
       console.error("Erreur lors de la suppression des appareils de l'utilisateur :", error.message);
@@ -94,6 +104,30 @@ export const removeDevice = async (userId, store) => {
     }
   } else {
     console.log("User ID non défini.");
+  }
+};
+
+export const getDataByDeviceId = async (deviceId, store) => {
+  if (!deviceId) {
+    console.error("Device ID non fourni.");
+    return null;
+  }
+
+  const deviceRef = ref(db, `devices/${deviceId}`);
+  try {
+    const snapshot = await get(deviceRef);
+    if (snapshot.exists()) {
+      const deviceData = snapshot.val();
+      console.log("Données du device :", deviceData);
+      return deviceData; // Retourner les données en tant qu'objet
+    } else {
+      store.setHasDevices(false);
+      console.log("Device ID introuvable dans la base de données.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données du device :", error.message);
+    return null;
   }
 };
 

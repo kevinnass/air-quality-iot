@@ -6,6 +6,7 @@ export const useUserStore = defineStore('user', () => {
   const auth = getAuth();
   const user = ref(null);
   const hasDevices = ref(false);
+  const devicesId = ref(null);
 
   const initAuth = () => {
     return new Promise((resolve) => {
@@ -26,11 +27,17 @@ export const useUserStore = defineStore('user', () => {
     hasDevices.value = value;
   };
 
+  const setDeviceId = (value) => {
+    devicesId.value = value;
+  };
+
   return {
     user,
     initAuth,
     setHasDevices,
+    setDeviceId,
     hasDevices,
+    devicesId,
     logout
   };
 });
