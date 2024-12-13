@@ -2,7 +2,7 @@
   <img src='' alt='' width='600'/>
 </p>
 
-# Vue.js Chatting Group Application
+# Vue.js IoT Air quality Control
 Features:
 
 - 🛠 [Vue 3](https://v3.vuejs.org/guide/introduction.html)
@@ -11,8 +11,6 @@ Features:
 - 🛣 [Vue Router](https://github.com/vuejs/vue-router-next)
 - 🎨 [Tailwind CSS](https://tailwindcss.com/docs/)
 - 🔥 [Firebase](https://console.firebase.google.com/)
-- 💼 [Axios](https://axios-http.com/)
-- 🌐 [Surge](https://surge.sh/)
 
 ## Getting Started
 Install and start dev server
@@ -20,9 +18,4 @@ Install and start dev server
 pnpm install
 pnpm run dev
 
-# Description
-<h4>
-  This app is a messaging application that can be used in a group and based on a realtime database from firebase
-</h4>
-
-# Url: http://chatapp-firebase.surge.sh/
+# Url: [Air Quality IoT](https://air-quality-iot-kevinnass-projects.vercel.app)
